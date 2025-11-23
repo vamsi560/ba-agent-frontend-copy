@@ -54,7 +54,7 @@
   },
   "proxy": "https://backend-new-bagaent1.vercel.app",
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "overrides": {
     "ajv": "^6.12.6"
