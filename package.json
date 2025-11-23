@@ -13,6 +13,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2",
     "dompurify": "^3.2.6",
     "html-to-image": "^1.11.13",
     "jszip": "^3.10.1",
@@ -57,7 +58,8 @@
     "node": "22.x"
   },
   "overrides": {
-    "ajv": "^6.12.6"
+    "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2"
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
