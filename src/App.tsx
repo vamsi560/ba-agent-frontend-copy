@@ -803,9 +803,9 @@ function MainApp() {
             <AdvancedSearch 
               documents={documents}
               analyses={pastAnalyses}
-              onSearchResults={(results) => {
-                const docResults = results.filter((r: any) => r.type === 'document') as Document[];
-                const analysisResults = results.filter((r: any) => r.type === 'analysis') as Analysis[];
+              onSearchResults={(results: Array<(Document | Analysis) & { type: 'document' | 'analysis' }>) => {
+                const docResults = results.filter((r) => r.type === 'document') as Document[];
+                const analysisResults = results.filter((r) => r.type === 'analysis') as Analysis[];
                 setFilteredDocuments(docResults);
                 setFilteredAnalyses(analysisResults);
               }}
