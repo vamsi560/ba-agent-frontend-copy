@@ -151,7 +151,7 @@ const MermaidDiagram: React.FC<MermaidDiagramProps> = ({
           updated = updated.replace(reNode, ($0, p1, p2) => `${p1}${p2}${newId}`);
         });
         updated = updated.replace(/class\s+([A-Za-z0-9_,\s]+)\s+([A-Za-z_][\w]*)\s*;/g, (full, ids, cls) => {
-          const mapped = ids.split(',').map(s => {
+          const mapped = ids.split(',').map((s: string) => {
             const v = s.trim();
             return idMap.get(v) || v;
           }).join(',');
