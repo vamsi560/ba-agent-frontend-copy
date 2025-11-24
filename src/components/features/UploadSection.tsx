@@ -1,6 +1,6 @@
 import React from 'react';
 import { UploadCloud, Cloud, X, Send as SendIcon, Download, CheckCircle } from 'lucide-react';
-import { AnalysisResults } from '../../types';
+import { AnalysisResults, Notification } from '../../types';
 import OneDriveStatusIndicator from '../common/OneDriveStatusIndicator';
 import ProgressStepper from './ProgressStepper';
 import ResultsTabs from './ResultsTabs';
@@ -15,7 +15,7 @@ interface UploadSectionProps {
   currentStep: number;
   stepNames: string[];
   approvalReady: boolean;
-  selectedDocument: any;
+  selectedDocument: { id?: string; name?: string; filename?: string } | null;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -27,7 +27,7 @@ interface UploadSectionProps {
   onSendForApproval: () => void;
   onCopy: (text: string, label: string) => Promise<void>;
   onDownloadDocx: (markdownContent: string, filename: string) => Promise<void>;
-  onSetNotification: (notification: any) => void;
+  onSetNotification: (notification: Notification) => void;
   onSetResults: React.Dispatch<React.SetStateAction<AnalysisResults | null>>;
   apiBaseUrl: string;
 }

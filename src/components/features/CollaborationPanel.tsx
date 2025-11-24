@@ -3,7 +3,7 @@ import { Bell } from 'lucide-react';
 
 interface CollaborationPanelProps {
   notifications?: string[];
-  messages?: any[];
+  messages?: Array<{ id: string; text: string; timestamp?: string }>;
 }
 
 const CollaborationPanel: React.FC<CollaborationPanelProps> = ({ notifications, messages }) => {

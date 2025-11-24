@@ -31,10 +31,21 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     return { ...acc, [tag]: count };
   }, {} as Record<string, number>);
   
+  // Helper function to get date from Document or Analysis
+  const getDate = (item: Document | Analysis): string => {
+    if ('uploadDate' in item && item.uploadDate) {
+      return item.uploadDate;
+    }
+    if ('date' in item && item.date) {
+      return item.date;
+    }
+    return '';
+  };
+
   const recentActivity = [...documents, ...analyses]
     .sort((a, b) => {
-      const dateA = new Date(a.uploadDate || a.date || 0).getTime();
-      const dateB = new Date(b.uploadDate || b.date || 0).getTime();
+      const dateA = new Date(getDate(a) || '0').getTime();
+      const dateB = new Date(getDate(b) || '0').getTime();
       return dateB - dateA;
     })
     .slice(0, 5);
@@ -112,7 +123,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                   {item.name || (item as Analysis).title || 'Untitled'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {new Date(item.uploadDate || (item as Analysis).date || '').toLocaleDateString()}
+                  {new Date(getDate(item) || '').toLocaleDateString()}
                 </p>
               </div>
               {item.lob && (
