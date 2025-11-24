@@ -261,7 +261,7 @@ const ResultsTabs: React.FC<ResultsTabsProps> = ({
               onLanguageChange={(languageCode: string) => {
                 console.log('Language changed to:', languageCode);
               }}
-              onTranslationRequest={(content, targetLanguage) => {
+              onTranslationRequest={(content: string, targetLanguage: string) => {
                 console.log('Translation requested:', targetLanguage);
               }}
               supportedLanguages={[
