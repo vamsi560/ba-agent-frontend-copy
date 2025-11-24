@@ -42,6 +42,20 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     return '';
   };
 
+  // Helper function to get name/title from Document or Analysis
+  const getName = (item: Document | Analysis): string => {
+    if ('name' in item && item.name) {
+      return item.name;
+    }
+    if ('title' in item && item.title) {
+      return item.title;
+    }
+    if ('filename' in item && item.filename) {
+      return item.filename;
+    }
+    return 'Untitled';
+  };
+
   const recentActivity = [...documents, ...analyses]
     .sort((a, b) => {
       const dateA = new Date(getDate(a) || '0').getTime();
@@ -120,7 +134,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-800">
-                  {item.name || (item as Analysis).title || 'Untitled'}
+                  {getName(item)}
                 </p>
                 <p className="text-xs text-gray-500">
                   {new Date(getDate(item) || '').toLocaleDateString()}
