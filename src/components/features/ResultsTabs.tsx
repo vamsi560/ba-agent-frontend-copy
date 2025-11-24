@@ -11,6 +11,22 @@ import SmartSuggestions from '../SmartSuggestions';
 import RealTimeComments from '../RealTimeComments';
 import MultiLanguageSupport from '../MultiLanguageSupport';
 
+interface Suggestion {
+  id: string;
+  title: string;
+  description: string;
+  suggestion?: string;
+  priority?: string;
+  category?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  bgColor?: string;
+  borderColor?: string;
+  color?: string;
+  applied?: boolean;
+  appliedAt?: string;
+  [key: string]: any; // Allow additional properties
+}
+
 interface ResultsTabsProps {
   results: AnalysisResults | null;
   selectedDocument: Document | null;
@@ -209,10 +225,10 @@ const ResultsTabs: React.FC<ResultsTabsProps> = ({
             <SmartSuggestions 
               document={selectedDocument}
               analysis={results}
-              onApplySuggestion={(suggestion) => {
+              onApplySuggestion={(suggestion: Suggestion) => {
                 console.log('Applying suggestion:', suggestion);
               }}
-              onDismissSuggestion={(suggestion) => {
+              onDismissSuggestion={(suggestion: Suggestion) => {
                 console.log('Dismissing suggestion:', suggestion);
               }}
               showSuggestions={true}
@@ -223,16 +239,16 @@ const ResultsTabs: React.FC<ResultsTabsProps> = ({
               documentId={selectedDocument?.id || 'current-document'}
               documentTitle={selectedDocument?.filename || 'Current Document'}
               currentUser={{ id: 'user1', name: 'Current User', avatar: null }}
-              onCommentAdd={(comment) => {
+              onCommentAdd={(comment: any) => {
                 console.log('New comment added:', comment);
               }}
-              onCommentUpdate={(commentId, content) => {
+              onCommentUpdate={(commentId: string, content: string) => {
                 console.log('Comment updated:', commentId, content);
               }}
-              onCommentDelete={(commentId) => {
+              onCommentDelete={(commentId: string) => {
                 console.log('Comment deleted:', commentId);
               }}
-              onCommentReply={(parentId, reply) => {
+              onCommentReply={(parentId: string, reply: any) => {
                 console.log('Reply added:', parentId, reply);
               }}
               showComments={true}
@@ -242,7 +258,7 @@ const ResultsTabs: React.FC<ResultsTabsProps> = ({
 
             <MultiLanguageSupport 
               document={selectedDocument}
-              onLanguageChange={(languageCode) => {
+              onLanguageChange={(languageCode: string) => {
                 console.log('Language changed to:', languageCode);
               }}
               onTranslationRequest={(content, targetLanguage) => {
