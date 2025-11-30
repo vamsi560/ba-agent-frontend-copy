@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Target, Bell, User, Menu, X, CheckCircle, Download, Send as SendIcon, Cloud
+  Target, Bell, User, Menu, X, CheckCircle, Download, Send as SendIcon
 } from 'lucide-react';
 import JSZip from 'jszip';
 import LoginPage from './LoginPage';
-import OneDrivePicker from './components/OneDrivePicker';
 import EnhancedDocumentViewer from './components/EnhancedDocumentViewer';
 import AdvancedSearch from './components/AdvancedSearch';
 import { ErrorBoundary } from './components/common';
@@ -94,11 +93,10 @@ function MainApp() {
   const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({ start: null, end: null });
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'in-progress' | 'pending'>('all');
 
-  // OneDrive Integration State
-  const [showOneDrivePicker, setShowOneDrivePicker] = useState<boolean>(false);
-  const [onedriveFiles, setOnedriveFiles] = useState<any[]>([]);
-  const [onedriveLoading, setOnedriveLoading] = useState<boolean>(false);
   const [showUploadContainer, setShowUploadContainer] = useState<boolean>(true);
+  
+  // TRD Section Selection State
+  const [selectedTRDSections, setSelectedTRDSections] = useState<string[]>([]);
 
   // Full Analysis Modal State
   const [fullAnalysisModal, setFullAnalysisModal] = useState<{ open: boolean; data: any; loading: boolean; error: string | null }>({ 
@@ -430,7 +428,7 @@ function MainApp() {
     setDragActive(false); 
   };
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, selectedSections?: string[]) => {
     if (!file) return;
     
     setIsProcessing(true);
@@ -441,6 +439,11 @@ function MainApp() {
     
     const formData = new FormData();
     formData.append('file', file);
+    
+    // Add selected sections if provided
+    if (selectedSections && selectedSections.length > 0) {
+      formData.append('selected_sections', JSON.stringify(selectedSections));
+    }
 
     try {
       setNotification({ show: true, message: 'Uploading document...', type: 'info' });
@@ -511,98 +514,19 @@ function MainApp() {
     e.preventDefault();
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput?.files?.[0]) {
-      await handleFileUpload(fileInput.files[0]);
-    }
-  };
-
-  // OneDrive Integration Handlers
-  const handleOneDriveFileSelect = async (onedriveFile: File) => {
-    try {
-      setOnedriveLoading(true);
-      setNotification({ show: true, message: 'Processing OneDrive file...', type: 'info' });
-      
-      await handleFileUpload(onedriveFile);
-      
-      setNotification({ 
-        show: true, 
-        message: `OneDrive file "${onedriveFile.name}" processed successfully!`, 
-        type: 'success' 
-      });
-    } catch (error: any) {
-      console.error('Error processing OneDrive file:', error);
-      setNotification({ 
-        show: true, 
-        message: `Failed to process OneDrive file: ${error.message}`, 
-        type: 'error' 
-      });
-    } finally {
-      setOnedriveLoading(false);
-    }
-  };
-
-  const handleConnectOneDrive = async () => {
-    try {
-      setOnedriveLoading(true);
-      setNotification({ show: true, message: 'Getting OneDrive authorization...', type: 'info' });
-      
-      const response = await fetch('/api/integrations/onedrive/auth');
-      if (!response.ok) {
-        throw new Error('Failed to get authorization URL');
-      }
-      
-      const data = await response.json();
-      
-      const authWindow = window.open(data.auth_url, 'OneDrive Auth', 'width=600,height=700');
-      
-      if (!authWindow) {
+      // Validate that at least one section is selected
+      if (selectedTRDSections.length === 0) {
         setNotification({ 
           show: true, 
-          message: 'Please allow popups to connect OneDrive', 
+          message: 'Please select at least one TRD section to generate', 
           type: 'warning' 
         });
         return;
       }
-      
-      setNotification({ 
-        show: true, 
-        message: 'Please complete the OneDrive authorization in the new window', 
-        type: 'info' 
-      });
-      
-      const checkClosed = setInterval(() => {
-        if (authWindow.closed) {
-          clearInterval(checkClosed);
-          setNotification({ 
-            show: true, 
-            message: 'OneDrive authorization completed! You can now select documents.', 
-            type: 'success' 
-          });
-          setTimeout(() => {
-            const event = new CustomEvent('onedrive-status-refresh');
-            window.dispatchEvent(event);
-          }, 1000);
-        }
-      }, 1000);
-      
-    } catch (error: any) {
-      console.error('Error connecting to OneDrive:', error);
-      setNotification({ 
-        show: true, 
-        message: `Failed to connect OneDrive: ${error.message}`, 
-        type: 'error' 
-      });
-    } finally {
-      setOnedriveLoading(false);
+      await handleFileUpload(fileInput.files[0], selectedTRDSections);
     }
   };
 
-  const openOneDrivePicker = () => {
-    setShowOneDrivePicker(true);
-  };
-
-  const closeOneDrivePicker = () => {
-    setShowOneDrivePicker(false);
-  };
 
   const handleDownloadAll = () => {
     if (!results) return;
@@ -822,7 +746,6 @@ function MainApp() {
                 setShowUploadContainer={setShowUploadContainer}
                 isProcessing={isProcessing}
                 dragActive={dragActive}
-                onedriveLoading={onedriveLoading}
                 currentStep={currentStep}
                 stepNames={stepNames}
                 approvalReady={approvalReady}
@@ -832,8 +755,6 @@ function MainApp() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onSubmit={handleSubmit}
-                onConnectOneDrive={handleConnectOneDrive}
-                onOpenOneDrivePicker={openOneDrivePicker}
                 onDownloadAll={handleDownloadAll}
                 onSendForApproval={handleSendForApproval}
                 onCopy={handleCopy}
@@ -841,6 +762,8 @@ function MainApp() {
                 onSetNotification={setNotification}
                 onSetResults={setResults}
                 apiBaseUrl={API_BASE_URL}
+                selectedTRDSections={selectedTRDSections}
+                onTRDSectionsChange={setSelectedTRDSections}
               />
             )}
 
@@ -918,13 +841,6 @@ function MainApp() {
         </div>
       )}
 
-      {/* OneDrive Picker Modal */}
-      <OneDrivePicker
-        isVisible={showOneDrivePicker}
-        onFileSelect={handleOneDriveFileSelect}
-        onClose={closeOneDrivePicker}
-        title="Select Document from OneDrive"
-      />
     </div>
   );
 }

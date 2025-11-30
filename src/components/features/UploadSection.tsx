@@ -1,9 +1,9 @@
 import React from 'react';
-import { UploadCloud, Cloud, X, Send as SendIcon, Download, CheckCircle } from 'lucide-react';
+import { UploadCloud, X, Send as SendIcon, Download, CheckCircle } from 'lucide-react';
 import { AnalysisResults, Notification } from '../../types';
-import OneDriveStatusIndicator from '../common/OneDriveStatusIndicator';
 import ProgressStepper from './ProgressStepper';
 import ResultsTabs from './ResultsTabs';
+import TRDSectionSelector from './TRDSectionSelector';
 
 interface UploadSectionProps {
   results: AnalysisResults | null;
@@ -11,7 +11,6 @@ interface UploadSectionProps {
   setShowUploadContainer: (show: boolean) => void;
   isProcessing: boolean;
   dragActive: boolean;
-  onedriveLoading: boolean;
   currentStep: number;
   stepNames: string[];
   approvalReady: boolean;
@@ -21,8 +20,6 @@ interface UploadSectionProps {
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onConnectOneDrive: () => void;
-  onOpenOneDrivePicker: () => void;
   onDownloadAll: () => void;
   onSendForApproval: () => void;
   onCopy: (text: string, label: string) => Promise<void>;
@@ -30,6 +27,8 @@ interface UploadSectionProps {
   onSetNotification: (notification: Notification) => void;
   onSetResults: React.Dispatch<React.SetStateAction<AnalysisResults | null>>;
   apiBaseUrl: string;
+  selectedTRDSections: string[];
+  onTRDSectionsChange: (sections: string[]) => void;
 }
 
 const UploadSection: React.FC<UploadSectionProps> = ({
@@ -38,7 +37,6 @@ const UploadSection: React.FC<UploadSectionProps> = ({
   setShowUploadContainer,
   isProcessing,
   dragActive,
-  onedriveLoading,
   currentStep,
   stepNames,
   approvalReady,
@@ -48,15 +46,15 @@ const UploadSection: React.FC<UploadSectionProps> = ({
   onDragOver,
   onDragLeave,
   onSubmit,
-  onConnectOneDrive,
-  onOpenOneDrivePicker,
   onDownloadAll,
   onSendForApproval,
   onCopy,
   onDownloadDocx,
   onSetNotification,
   onSetResults,
-  apiBaseUrl
+  apiBaseUrl,
+  selectedTRDSections,
+  onTRDSectionsChange
 }) => {
   return (
     <div className="space-y-4">
@@ -82,46 +80,12 @@ const UploadSection: React.FC<UploadSectionProps> = ({
             Upload your business requirements document (PDF or DOCX) to generate comprehensive analysis including technical requirements, diagrams, and project backlog.
           </p>
 
-          {/* OneDrive Integration */}
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Cloud className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">OneDrive Integration</span>
-                <OneDriveStatusIndicator />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={onConnectOneDrive}
-                  className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Cloud className="w-4 h-4" />
-                  Connect OneDrive
-                </button>
-                <button
-                  type="button"
-                  onClick={onOpenOneDrivePicker}
-                  disabled={isProcessing || onedriveLoading}
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {onedriveLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      <Cloud className="w-4 h-4" />
-                      Select from OneDrive
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-            <p className="text-xs text-blue-600 mt-2">
-              Connect your OneDrive account to access and import documents directly for analysis.
-            </p>
+          {/* TRD Section Selector */}
+          <div className="mb-4">
+            <TRDSectionSelector
+              selectedSections={selectedTRDSections}
+              onChange={onTRDSectionsChange}
+            />
           </div>
 
           {isProcessing && (
@@ -164,7 +128,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
             <div className="flex justify-center">
               <button
                 type="submit"
-                disabled={isProcessing}
+                disabled={isProcessing || selectedTRDSections.length === 0}
                 className="btn-primary flex items-center gap-2 px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? (

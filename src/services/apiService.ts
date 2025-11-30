@@ -16,10 +16,10 @@ import {
   RenderMermaidResponse,
   ConvertMermaidToDrawioRequest,
   ConvertMermaidToDrawioResponse,
-  OneDriveStatusResponse,
-  OneDriveFilesResponse,
   AzureDevOpsStatusResponse,
   AzureDevOpsTestResponse,
+  TRDSection,
+  TRDSectionsResponse,
 } from '../types/api';
 import { Document, Analysis } from '../types';
 
@@ -181,36 +181,6 @@ class ApiService {
     return response.json();
   }
 
-  // OneDrive Integration APIs
-  async getOneDriveStatus(): Promise<OneDriveStatusResponse> {
-    const response = await fetch(`${this.baseUrl}/api/integrations/onedrive/status`);
-    
-    if (response.status === 401) {
-      return {
-        configured: false,
-        user_connected: false,
-        message: 'Please log in to check OneDrive status',
-      };
-    }
-
-    if (!response.ok) {
-      throw new Error('Failed to check OneDrive status');
-    }
-
-    return response.json();
-  }
-
-  async getOneDriveAuthUrl(): Promise<string> {
-    const response = await fetch('/api/integrations/onedrive/auth');
-    
-    if (!response.ok) {
-      throw new Error('Failed to get OneDrive auth URL');
-    }
-
-    const data = await response.json();
-    return data.auth_url || data.url;
-  }
-
   // Azure DevOps APIs
   async getAzureDevOpsStatus(): Promise<AzureDevOpsStatusResponse> {
     const response = await fetch(`${this.baseUrl}/api/ado/status`);
@@ -236,6 +206,19 @@ class ApiService {
     }
 
     return response.json();
+  }
+
+  // TRD Section APIs
+  async getTRDSections(): Promise<TRDSection[]> {
+    const response = await fetch(`${this.baseUrl}/api/trd/sections`);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch TRD sections');
+    }
+
+    const data: TRDSectionsResponse = await response.json();
+    return data.sections || [];
   }
 }
 

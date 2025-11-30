@@ -120,17 +120,6 @@ export interface FilterState {
   statusFilter: 'all' | 'completed' | 'in-progress' | 'pending';
 }
 
-export interface OneDriveFile {
-  id: string;
-  name: string;
-  webUrl: string;
-  size?: number;
-  lastModifiedDateTime?: string;
-  file?: {
-    mimeType: string;
-  };
-}
-
 export interface ApprovalStatus {
   id: string;
   status: 'pending' | 'approved' | 'rejected';

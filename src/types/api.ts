@@ -1,6 +1,6 @@
 // API request and response types
 
-import { Document, Analysis, AnalysisResults, BacklogItem, OneDriveFile, ApprovalStatus, AzureDevOpsStatus } from './index';
+import { Document, Analysis, AnalysisResults, BacklogItem, ApprovalStatus, AzureDevOpsStatus } from './index';
 
 // API Base URL
 export const API_BASE_URL = 'https://backend-new-bagaent1.vercel.app';
@@ -10,6 +10,7 @@ export interface GenerateRequest {
   file?: File;
   text?: string;
   document_id?: string;
+  selected_sections?: string[];
 }
 
 export interface UploadDocumentRequest {
@@ -86,18 +87,6 @@ export interface ConvertMermaidToDrawioResponse {
   error?: string;
 }
 
-export interface OneDriveStatusResponse {
-  configured: boolean;
-  user_connected: boolean;
-  message?: string;
-}
-
-export interface OneDriveFilesResponse {
-  files: OneDriveFile[];
-  success: boolean;
-  error?: string;
-}
-
 export interface AzureDevOpsStatusResponse extends AzureDevOpsStatus {
   success: boolean;
   error?: string;
@@ -106,6 +95,18 @@ export interface AzureDevOpsStatusResponse extends AzureDevOpsStatus {
 export interface AzureDevOpsTestResponse {
   success: boolean;
   message?: string;
+  error?: string;
+}
+
+export interface TRDSection {
+  key: string;
+  title: string;
+  description: string;
+}
+
+export interface TRDSectionsResponse {
+  sections: TRDSection[];
+  success?: boolean;
   error?: string;
 }
 

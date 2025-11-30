@@ -15,4 +15,5 @@ export { default as DocumentsSection } from './DocumentsSection';
 export { default as PastAnalysesSection } from './PastAnalysesSection';
 export { default as ResultsTabs } from './ResultsTabs';
 export { default as UploadSection } from './UploadSection';
+export { default as TRDSectionSelector } from './TRDSectionSelector';
 
